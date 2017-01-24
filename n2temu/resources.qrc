@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="folder_documents">icons/folder_documents.png</file>
+        <file alias="1rightarrow">icons/1rightarrow.png</file>
+        <file alias="2leftarrow">icons/2leftarrow.png</file>
+        <file alias="2rightarrow">icons/2rightarrow.png</file>
+        <file alias="stop">icons/stop.png</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,76 @@
+#ifndef EMU_H
+#define EMU_H
+
+#include <QtCore/qglobal.h>
+
+#include "cpu.h"
+#include "memory.h"
+#include "codetablemodel.h"
+
+class CPU;
+
+enum CPURegister { CPU_REG_A, CPU_REG_D, CPU_REG_PC };
+enum KeyCode {
+        K_ENTER     = 128,
+        K_BACKSPACE = 129,
+        K_LEFT      = 130,
+        K_UP        = 131,
+        K_RIGHT     = 132,
+        K_DOWN      = 133,
+        K_HOME      = 134,
+        K_END       = 135,
+        K_PGUP      = 136,
+        K_PGDN      = 137,
+        K_INS       = 138,
+        K_DEL       = 139,
+        K_ESC       = 140,
+        K_F1        = 141,
+        K_F2        = 142,
+        K_F3        = 143,
+        K_F4        = 144,
+        K_F5        = 145,
+        K_F6        = 146,
+        K_F7        = 147,
+        K_F8        = 148,
+        K_F9        = 149,
+        K_F10       = 150,
+        K_F11       = 151,
+        K_F12       = 152
+};
+
+class Emu: public AbsMemory
+{
+    Q_OBJECT
+
+public:
+    Emu(VideoFramebuffer *videofb, CodeTableModel *codeModel);
+    ~Emu();
+    void reset();
+    void run(int steps);
+    void load(const QString &romPath);
+
+    virtual quint16 peek(int addr);
+    virtual void poke(int addr, quint16 value);
+
+    quint16 fetch(int addr);
+    void enableRealtimeNotifications(bool value);
+
+    void onKeyDown(int key);
+    void onKeyUp(int key);
+
+signals:
+    void registerChanged(CPURegister reg, int newValue);
+    void memChanged(int address, int newValue);
+
+private:
+    bool realtimeNotifications;
+    int key;
+
+    CPU *cpu;
+    ROM16 *rom;
+    RAM16 *ram;
+    VideoFramebuffer *videofb;
+    CodeTableModel *codeModel;
+};
+
+#endif // EMU_H
