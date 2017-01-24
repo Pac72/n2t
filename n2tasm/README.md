@@ -4,4 +4,4 @@
 mvn package
 
 ## Run
-java -jar target/n2tasm-1.0.0-SNAPSHOT.jar sourcefile.asm
+java -cp target/n2tasm-1.0.0-SNAPSHOT.jar org.pacsoft.nand2tetris.n2tasm.Main sourcefile.asm
