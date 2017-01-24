@@ -1,4 +1,4 @@
-package org.pacsoft.nand2tetris.n2tasm.instruction;
+package org.pacsoft.nand2tetris.n2tasm.token;
 
 import org.pacsoft.nand2tetris.n2tasm.parser.Symbol;
 

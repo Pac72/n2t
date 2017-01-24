@@ -4,7 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.pacsoft.nand2tetris.n2tasm.SymbolTable;
-import org.pacsoft.nand2tetris.n2tasm.instruction.AInstruction;
+import org.pacsoft.nand2tetris.n2tasm.token.AInstruction;
 
 public class AInstructionParser {
 	private final static Pattern INTEGER_PATTERN = Pattern.compile("^[0-9]+$");

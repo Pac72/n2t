@@ -3,7 +3,7 @@ package org.pacsoft.nand2tetris.n2tasm.parser;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.pacsoft.nand2tetris.n2tasm.instruction.CInstruction;
+import org.pacsoft.nand2tetris.n2tasm.token.CInstruction;
 
 public class CInstructionParser {
 	private static class LazyHolder {

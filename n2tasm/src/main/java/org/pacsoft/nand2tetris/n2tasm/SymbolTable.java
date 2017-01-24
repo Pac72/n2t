@@ -1,6 +1,10 @@
 package org.pacsoft.nand2tetris.n2tasm;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.pacsoft.nand2tetris.n2tasm.parser.DuplicateLabelException;
@@ -93,7 +97,17 @@ public class SymbolTable {
 
 	public int resolveAll() {
 		int currentDataAddress = FIRST_DATA_ADDRESS;
-		for (Location location: locations.values()) {
+		List<Location> locationsSortedByLine = new ArrayList<>(locations.values());
+
+		Collections.sort(locationsSortedByLine, new Comparator<Location>() {
+			@Override
+			public int compare(Location o1, Location o2) {
+				int result = o1.getDeclarationLine() - o2.getDeclarationLine();
+				return result;
+			}
+		});
+
+		for (Location location: locationsSortedByLine) {
 			if (location.getType() == Location.Type.UNKNOWN || location.getType() == Location.Type.DATA) {
 				location.setType(Location.Type.DATA);
 				location.setValue(currentDataAddress++);
@@ -101,5 +115,28 @@ public class SymbolTable {
 		}
 
 		return currentDataAddress;
+	}
+
+	public List<Location> getDataLocations() {
+		List<Location> dataLocations = new ArrayList<>();
+
+		for(Location location: locations.values()) {
+			if (Location.Type.DATA == location.getType() || Location.Type.BUILT_IN == location.getType()) {
+				dataLocations.add(location);
+			}
+		}
+
+		Collections.sort(dataLocations, new Comparator<Location>() {
+			@Override
+			public int compare(Location o1, Location o2) {
+				int result = o1.getValue() - o2.getValue();
+				if (0 == result) {
+					result = o1.getName().compareTo(o2.getName());
+				}
+				return result;
+			}
+		});
+
+		return dataLocations;
 	}
 }

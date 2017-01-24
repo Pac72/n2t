@@ -9,7 +9,9 @@ import java.util.regex.Pattern;
 
 import org.pacsoft.nand2tetris.n2tasm.AssemblerException;
 import org.pacsoft.nand2tetris.n2tasm.SymbolTable;
-import org.pacsoft.nand2tetris.n2tasm.instruction.Instruction;
+import org.pacsoft.nand2tetris.n2tasm.token.Instruction;
+import org.pacsoft.nand2tetris.n2tasm.token.Label;
+import org.pacsoft.nand2tetris.n2tasm.token.Token;
 
 public class Parser {
 	private final static String TOK_COMMENT = "//";
@@ -18,14 +20,16 @@ public class Parser {
 	private final static Pattern L_INST_PATTERN = Pattern.compile("^\\s*\\(([a-zA-Z_.$:][a-zA-Z_.$:0-9]*)\\)\\s*$");
 
 	private final SymbolTable symbolTable;
-	private final List<Instruction> instructions;
+	private final List<Token> tokens;
 	private final List<ParserException> errors;
 	private int currLineNo;
+	private int currAddress;
 
 	public Parser(SymbolTable symbolTable) {
 		this.symbolTable = symbolTable;
 		currLineNo = 0;
-		instructions = new ArrayList<Instruction>();
+		currAddress = 0;
+		tokens = new ArrayList<Token>();
 		errors = new ArrayList<ParserException>();
 	}
 
@@ -42,8 +46,8 @@ public class Parser {
 		return errors.size() < 1;
 	}
 
-	public List<Instruction> getInstructions() {
-		return instructions;
+	public List<Token> getTokens() {
+		return tokens;
 	}
 
 	public List<ParserException> getErrors() {
@@ -75,7 +79,9 @@ public class Parser {
 	
 			if (mm.matches()) {
 				Instruction instr = CInstructionParser.parse(mm.group(2), mm.group(3), mm.group(5));
-				instructions.add(instr);
+				instr.setOriginalAssembler(line);
+				tokens.add(instr);
+				currAddress++;
 				return;
 			}
 	
@@ -83,15 +89,21 @@ public class Parser {
 
 			if (mm.matches()) {
 				Instruction instr = AInstructionParser.parse(currLineNo, mm.group(1), symbolTable);
+				instr.setOriginalAssembler(line);
 				instr.setLine(currLineNo);
-				instructions.add(instr);
+				tokens.add(instr);
+				currAddress++;
 				return;
 			}
 
 			mm = L_INST_PATTERN.matcher(line);
 			if (mm.matches()) {
-				int address = instructions.size();
-				symbolTable.defineLabel(currLineNo, mm.group(1), address);
+				String name = mm.group(1);
+				symbolTable.defineLabel(currLineNo, name, currAddress);
+				Label label = new Label(name);
+				label.setOriginalAssembler(line);
+				label.setLine(currLineNo);
+				tokens.add(label);
 				return;
 			}
 
