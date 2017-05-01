@@ -1,0 +1,6 @@
+*.o
+Makefile
+n2temu
+moc_*.cpp
+ui_mainwindow.h
+qrc_resources.cpp
