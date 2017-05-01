@@ -7,6 +7,8 @@
 #include "codetablemodel.h"
 #include "memtablemodel.h"
 
+#include <QDebug>
+#include <QFile>
 #include <QStringRef>
 
 Emu::Emu(VideoFramebuffer *videofb,
@@ -15,11 +17,17 @@ Emu::Emu(VideoFramebuffer *videofb,
     this->codeModel = codeModel;
     realtimeNotifications = true;
 
+    codeModel->setEmu(this);
+
     ram = new RAM16(16384);
 
-    rom = new ROM16();
+    rom = new ROM16(32768);
 
     cpu = new CPU(this);
+
+    breakpoints = new bool[32768];
+
+    clearAllBreakpoints();
 
     key = 0;
 }
@@ -37,6 +45,8 @@ Emu::~Emu() {
         delete videofb;
         videofb = NULL;
     }
+
+    delete [] breakpoints;
 }
 
 void Emu::load(const QString &romPath) {
@@ -49,14 +59,17 @@ void Emu::load(const QString &romPath) {
     QStringRef romBasePath(&romPath, 0, ii);
 
     QString romHackdbgPath = romBasePath.toString() + ".hackdbg";
-    codeModel->load(romHackdbgPath);
+    codeModel->setROM(rom);
+    QFile romHackdbgFile(romHackdbgPath);
+
+    codeModel->loadDebugInfo(romHackdbgFile);
 }
 
 void Emu::enableRealtimeNotifications(bool value) {
     realtimeNotifications = value;
 }
 
-quint16 Emu::peek(int addr) {
+quint16 Emu::peek(int addr) const {
     if (addr < 0) {
         // invalid address
         return 0;
@@ -113,6 +126,10 @@ quint16 Emu::fetch(int addr) {
 
 void Emu::reset() {
     cpu->reset();
+    if (clearRAMOnReset) {
+        ram->clear();
+        videofb->clear();
+    }
 
     emit registerChanged(CPU_REG_A, cpu->get_reg_a());
     emit registerChanged(CPU_REG_D, cpu->get_reg_d());
@@ -121,13 +138,33 @@ void Emu::reset() {
     this->key = 0;
 }
 
-void Emu::run(int steps) {
+void Emu::emitRegistersChanged() const {
+    emit registerChanged(CPU_REG_A, cpu->get_reg_a());
+    emit registerChanged(CPU_REG_D, cpu->get_reg_d());
+    emit registerChanged(CPU_REG_PC, cpu->get_reg_pc());
+}
+
+void Emu::setClearRAMOnReset(bool clearRAMOnReset)
+{
+    this->clearRAMOnReset = clearRAMOnReset;
+}
+
+int Emu::get_reg_pc() const
+{
+    return cpu->get_reg_pc();
+}
+
+bool Emu::run(int steps, const bool stopOnBreakpoints) {
+    bool stoppedOnBreakpoint = false;
     qint16 reg_a = cpu->get_reg_a();
     qint16 reg_d = cpu->get_reg_d();
     quint16 reg_pc = cpu->get_reg_pc();
 
     for (int ii = 0; ii < steps; ii++) {
-        cpu->execute();
+        if (cpu->execute(stopOnBreakpoints)) {
+            stoppedOnBreakpoint = true;
+            break;
+        }
     }
 
     if (reg_a != cpu->get_reg_a()) {
@@ -138,6 +175,15 @@ void Emu::run(int steps) {
     }
     if (reg_pc != cpu->get_reg_pc()) {
         emit registerChanged(CPU_REG_PC, cpu->get_reg_pc());
+    }
+
+    return stoppedOnBreakpoint;
+}
+
+void Emu::clearAllBreakpoints()
+{
+    for (int ii = 0; ii < 32768; ii++) {
+        breakpoints[ii] = false;
     }
 }
 

@@ -31,10 +31,13 @@ public:
 
     void setHighlightedAddress(int newAddress);
     void emitDataChanged(int idx);
+    void refresh();
+    void setHexMode(const bool hexMode);
 
 private:
     int highlightedAddress;
     Emu *emu;
+    bool hexMode;
 };
 
 #endif // DATATABLEMODEL_H

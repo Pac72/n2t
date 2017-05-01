@@ -185,7 +185,10 @@ void CPU::execute_c_instr(quint16 instr) {
     update_pc(alu_value, jump);
 }
 
-void CPU::execute() {
+bool CPU::execute(const bool stopOnBreakpoints) {
+    if (stopOnBreakpoints && emu->breakpointAt(reg_pc)) {
+        return true;
+    }
     quint16 instr = emu->fetch(reg_pc);
 
 //    qWarning("CPU::execute(): pc=0x%04x i=0x%04x a=0x%04x (%6d) d=0x%04x (%6d)",
@@ -198,4 +201,6 @@ void CPU::execute() {
     } else {
         execute_c_instr(instr);
     }
+
+    return false;
 }

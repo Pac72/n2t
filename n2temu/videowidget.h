@@ -16,6 +16,8 @@ public:
     void setMemory(quint16 address, quint16 value);
     quint16 getMemory(quint16 address);
 
+    void clear();
+
 protected:
     void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
 

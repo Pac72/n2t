@@ -8,8 +8,10 @@
 #include "codetablemodel.h"
 
 class CPU;
+class CodeTableModel;
 
 enum CPURegister { CPU_REG_A, CPU_REG_D, CPU_REG_PC };
+
 enum KeyCode {
         K_ENTER     = 128,
         K_BACKSPACE = 129,
@@ -46,11 +48,17 @@ public:
     Emu(VideoFramebuffer *videofb, CodeTableModel *codeModel);
     ~Emu();
     void reset();
-    void run(int steps);
+    bool run(int steps, const bool stopOnBreakpoints = true);
+    inline bool breakpointAt(const int addr) const { return breakpoints[addr]; }
+    bool toggleBreakpoint(const int addr) { return breakpoints[addr] = !breakpoints[addr]; }
+    void clearAllBreakpoints();
     void load(const QString &romPath);
+    void emitRegistersChanged() const ;
+    void setClearRAMOnReset(bool clearRAMOnReset);
 
-    virtual quint16 peek(int addr);
+    virtual quint16 peek(int addr) const;
     virtual void poke(int addr, quint16 value);
+    int get_reg_pc() const;
 
     quint16 fetch(int addr);
     void enableRealtimeNotifications(bool value);
@@ -59,8 +67,8 @@ public:
     void onKeyUp(int key);
 
 signals:
-    void registerChanged(CPURegister reg, int newValue);
-    void memChanged(int address, int newValue);
+    void registerChanged(CPURegister reg, int newValue) const;
+    void memChanged(int address, int newValue) const;
 
 private:
     bool realtimeNotifications;
@@ -71,6 +79,8 @@ private:
     RAM16 *ram;
     VideoFramebuffer *videofb;
     CodeTableModel *codeModel;
+    bool clearRAMOnReset;
+    bool *breakpoints;
 };
 
 #endif // EMU_H

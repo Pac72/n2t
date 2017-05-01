@@ -20,7 +20,8 @@ SOURCES += main.cpp\
     emu.cpp \
     rom16loader.cpp \
     codetablemodel.cpp \
-    memtablemodel.cpp
+    memtablemodel.cpp \
+    disassembler.cpp
 
 HEADERS  += mainwindow.h \
     videowidget.h \
@@ -29,7 +30,8 @@ HEADERS  += mainwindow.h \
     emu.h \
     rom16loader.h \
     codetablemodel.h \
-    memtablemodel.h
+    memtablemodel.h \
+    disassembler.h
 
 FORMS    += mainwindow.ui
 

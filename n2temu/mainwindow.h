@@ -44,13 +44,26 @@ private slots:
 
     void on_actionOpen_triggered();
 
+    void on_checkBox_show_source_code_toggled(bool checked);
+
+    void on_checkBox_hex_mode_toggled(bool checked);
+
+    void on_checkBox_clear_RAM_on_reset_toggled(bool checked);
+
+    void on_tableViewCode_doubleClicked(const QModelIndex &index);
+
 private:
     void initializeUi();
     void updateTableViewCode(int newValue);
     void enableUiElements(bool enable);
+    void loadROM(const QString &romPath);
+    void doStop();
 
     bool realtimeNotifications;
     bool running;
+    bool hexMode;
+    bool clearRAMOnReset;
+    QString lastROMDir;
 
     Ui::MainWindow *ui;
     Emu *emu;

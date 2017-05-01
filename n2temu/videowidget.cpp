@@ -12,10 +12,13 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent) {
     penOff = QPen(Qt::white);
     penOff.setWidth(1);
     setAutoFillBackground(false);
-    int ii;
-    for (ii = 0; ii < 0x2000; ii++) {
-        memory[ii] = 0;
-    }
+
+    memset(memory, 0, 0x2000 * sizeof(quint16));
+}
+
+void VideoWidget::clear() {
+    memset(memory, 0, 0x2000 * sizeof(quint16));
+    update(0, 0, 512, 256);
 }
 
 void VideoWidget::setMemory(quint16 address, quint16 value) {

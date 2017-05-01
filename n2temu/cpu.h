@@ -12,7 +12,7 @@ class CPU
 public:
     CPU(Emu *emu);
     void reset();
-    void execute();
+    bool execute(const bool stopOnBreakpoints = true);
     inline qint16 get_reg_a() { return reg_a; }
     inline qint16 get_reg_d() { return reg_d; }
     inline quint16 get_reg_pc() { return reg_pc; }

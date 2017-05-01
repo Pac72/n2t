@@ -4,6 +4,8 @@
 MemTableModel::MemTableModel(QObject *parent)
     : QAbstractTableModel(parent)
 {
+    highlightedAddress = -1;
+    hexMode = false;
 }
 
 void MemTableModel::setEmu(Emu *emu) {
@@ -12,6 +14,8 @@ void MemTableModel::setEmu(Emu *emu) {
 
 QVariant MemTableModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
+    Q_UNUSED(orientation);
+
     if(role == Qt::DisplayRole) {
         if (0 == section) {
             return QString("Addr");
@@ -26,11 +30,15 @@ QVariant MemTableModel::headerData(int section, Qt::Orientation orientation, int
 
 int MemTableModel::rowCount(const QModelIndex &parent) const
 {
+    Q_UNUSED(parent);
+
     return emu->getSize();
 }
 
 int MemTableModel::columnCount(const QModelIndex &parent) const
 {
+    Q_UNUSED(parent);
+
     return 2;
 }
 
@@ -38,6 +46,12 @@ void MemTableModel::emitDataChanged(int idx) {
     QModelIndex topLeft = index(idx, 0);
     QModelIndex bottomRight = index(idx, 1);
     emit dataChanged(topLeft, bottomRight);
+}
+
+void MemTableModel::refresh()
+{
+    highlightedAddress = -1;
+    emit dataChanged(index(0, 0), index(emu->getSize(), 1));
 }
 
 void MemTableModel::setHighlightedAddress(int newAddress) {
@@ -54,11 +68,26 @@ QVariant MemTableModel::data(const QModelIndex &index, int role) const
     switch (role) {
         case Qt::DisplayRole:
             if (0 == index.column()) {
-                return QString::number(index.row());
+                if (hexMode) {
+                    return QString("%1").arg(index.row(), 4, 16, QChar('0'));
+                } else {
+                    return QString::number(index.row());
+                }
             } else {
-                return QString::number((qint16)emu->peek(index.row()));
+                qint16 value = (qint16)emu->peek(index.row());
+                if (hexMode) {
+                    return QString("%1").arg(value, 4, 16, QChar('0'));
+                } else {
+                    return QString::number(value);
+                }
             }
-            // not needed break;
+            break;
+
+        case Qt::TextAlignmentRole:
+            if (index.column() == 0) {
+                return Qt::AlignRight;
+            }
+            break;
 
         case Qt::BackgroundRole:
             if (index.row() == highlightedAddress) {
@@ -74,20 +103,8 @@ QVariant MemTableModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-//bool MemTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
-//{
-//    if (data(index, role) != value) {
-//        // FIXME: Implement me!
-//        emit dataChanged(index, index, QVector<int>() << role);
-//        return true;
-//    }
-//    return false;
-//}
+void MemTableModel::setHexMode(bool hexMode) {
+    this->hexMode = hexMode;
+    emit dataChanged(index(0, 0), index(emu->getSize(), 1));
+}
 
-//Qt::ItemFlags MemTableModel::flags(const QModelIndex &index) const
-//{
-////    if (!index.isValid())
-////        return Qt::NoItemFlags;
-
-//    return Qt::ItemIsEditable; // FIXME: Implement me!
-//}
