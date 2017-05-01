@@ -3,6 +3,7 @@
 #include "videowidget.h"
 #include "codetablemodel.h"
 #include "memtablemodel.h"
+#include "emu.h"
 
 #include <QAbstractItemView>
 #include <QDialog>
@@ -313,31 +314,31 @@ void MainWindow::on_actionOpen_triggered()
 
 static int translate(int rawKey) {
     switch(rawKey) {
-        case Qt::Key_Enter:     return KeyCode::K_ENTER;
-        case Qt::Key_Backspace: return KeyCode::K_BACKSPACE;
-        case Qt::Key_Left:      return KeyCode::K_LEFT;
-        case Qt::Key_Up:        return KeyCode::K_UP;
-        case Qt::Key_Right:     return KeyCode::K_RIGHT;
-        case Qt::Key_Down:      return KeyCode::K_DOWN;
-        case Qt::Key_Home:      return KeyCode::K_HOME;
-        case Qt::Key_End:       return KeyCode::K_END;
-        case Qt::Key_PageUp:    return KeyCode::K_PGUP;
-        case Qt::Key_PageDown:  return KeyCode::K_PGDN;
-        case Qt::Key_Insert:    return KeyCode::K_INS;
-        case Qt::Key_Delete:    return KeyCode::K_DEL;
-        case Qt::Key_Escape:    return KeyCode::K_ESC;
-        case Qt::Key_F1:      return KeyCode::K_F1;
-        case Qt::Key_F2:      return KeyCode::K_F2;
-        case Qt::Key_F3:      return KeyCode::K_F3;
-        case Qt::Key_F4:      return KeyCode::K_F4;
-        case Qt::Key_F5:      return KeyCode::K_F5;
-        case Qt::Key_F6:      return KeyCode::K_F6;
-        case Qt::Key_F7:      return KeyCode::K_F7;
-        case Qt::Key_F8:      return KeyCode::K_F8;
-        case Qt::Key_F9:      return KeyCode::K_F9;
-        case Qt::Key_F10:     return KeyCode::K_F10;
-        case Qt::Key_F11:     return KeyCode::K_F11;
-        case Qt::Key_F12:     return KeyCode::K_F12;
+        case Qt::Key_Enter:     return K_ENTER;
+        case Qt::Key_Backspace: return K_BACKSPACE;
+        case Qt::Key_Left:      return K_LEFT;
+        case Qt::Key_Up:        return K_UP;
+        case Qt::Key_Right:     return K_RIGHT;
+        case Qt::Key_Down:      return K_DOWN;
+        case Qt::Key_Home:      return K_HOME;
+        case Qt::Key_End:       return K_END;
+        case Qt::Key_PageUp:    return K_PGUP;
+        case Qt::Key_PageDown:  return K_PGDN;
+        case Qt::Key_Insert:    return K_INS;
+        case Qt::Key_Delete:    return K_DEL;
+        case Qt::Key_Escape:    return K_ESC;
+        case Qt::Key_F1:      return K_F1;
+        case Qt::Key_F2:      return K_F2;
+        case Qt::Key_F3:      return K_F3;
+        case Qt::Key_F4:      return K_F4;
+        case Qt::Key_F5:      return K_F5;
+        case Qt::Key_F6:      return K_F6;
+        case Qt::Key_F7:      return K_F7;
+        case Qt::Key_F8:      return K_F8;
+        case Qt::Key_F9:      return K_F9;
+        case Qt::Key_F10:     return K_F10;
+        case Qt::Key_F11:     return K_F11;
+        case Qt::Key_F12:     return K_F12;
 
         default:
             return rawKey;

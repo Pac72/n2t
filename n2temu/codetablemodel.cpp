@@ -174,7 +174,7 @@ void CodeTableModel::setROM(const ROM16 *rom)
 void CodeTableModel::setShowSource(bool showSrc)
 {
     this->showSrc = showSrc;
-    emit headerDataChanged(Qt::Orientation::Horizontal, 2, 2);
+    emit headerDataChanged(Qt::Horizontal, 2, 2);
     emit dataChanged(index(0, 0), index(rom->getSize(), 2));
 }
 
