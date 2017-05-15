@@ -306,7 +306,9 @@ void MainWindow::on_actionOpen_triggered()
             settings.sync();
             loadROM(filename);
         } else {
-            qWarning("Cannot find file " + filename.toLatin1());
+            QByteArray filenameba = filename.toLocal8Bit();
+            const char *c_filename = filenameba.data();
+            qWarning("Cannot find file %s", c_filename);
         }
     }
 }
