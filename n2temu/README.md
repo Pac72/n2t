@@ -1,13 +1,16 @@
 ## n2temu
 
-## Build
-qmake
+## Dependencies
+n2temu requires Qt5 and g++
 
-build
+## Build
+qmake -qt5
+
+make
 
 
 ## Run
 ./n2temu
 
-From the UI, choose a .hack file (it must come along with its .hackdbg companion), then step/run the program, choosing a suitable speed.
+From the UI, choose a .hack file (it may come along with its .hackdbg companion), then step/run the program, choosing a suitable speed.
 Keyboard works only in run mode.
