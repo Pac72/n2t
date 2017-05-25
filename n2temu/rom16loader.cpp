@@ -5,17 +5,19 @@
 #include <QTextStream>
 
 
-void ROM16Loader::load(const QString &fileName)
+bool ROM16Loader::load(const QString &fileName)
 {
-    if (data != NULL) {
-        free(data);
-        data = NULL;
-        size = 0;
-    }
+    bool loadedSuccesfully = false;
 
     QFile inputFile(fileName);
     if (inputFile.open(QIODevice::ReadOnly))
     {
+        if (data != NULL) {
+            free(data);
+            data = NULL;
+            size = 0;
+        }
+
         int currentSize = 0;
         quint16 *pdata = NULL;
         QTextStream in(&inputFile);
@@ -40,8 +42,11 @@ void ROM16Loader::load(const QString &fileName)
         size = currentSize;
         if (size > 0) {
             data = (quint16 *)realloc(data, size * sizeof(quint16));
+            loadedSuccesfully = true;
         } else {
             data = NULL;
         }
     }
+
+    return loadedSuccesfully;
 }

@@ -8,7 +8,7 @@ class ROM16Loader
 {
 public:
     ROM16Loader() { data = NULL; size = 0; }
-    void load(const QString &filename);
+    bool load(const QString &filename);
     inline quint16 *getData() const { return data; }
     inline int getDataSize() const { return size; }
 

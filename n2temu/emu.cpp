@@ -49,20 +49,26 @@ Emu::~Emu() {
     delete [] breakpoints;
 }
 
-void Emu::load(const QString &romPath) {
+bool Emu::load(const QString &romPath) {
+    bool loadedSuccesfully = false;
 
     ROM16Loader loader;
-    loader.load(romPath);
-    rom->initialize(loader);
+    if (loader.load(romPath)) {
+        rom->initialize(loader);
 
-    int ii = romPath.lastIndexOf('.');
-    QStringRef romBasePath(&romPath, 0, ii);
+        int ii = romPath.lastIndexOf('.');
+        QStringRef romBasePath(&romPath, 0, ii);
 
-    QString romHackdbgPath = romBasePath.toString() + ".hackdbg";
-    codeModel->setROM(rom);
-    QFile romHackdbgFile(romHackdbgPath);
+        QString romHackdbgPath = romBasePath.toString() + ".hackdbg";
+        codeModel->setROM(rom);
+        QFile romHackdbgFile(romHackdbgPath);
 
-    codeModel->loadDebugInfo(romHackdbgFile);
+        codeModel->loadDebugInfo(romHackdbgFile);
+
+        loadedSuccesfully = true;
+    }
+
+    return loadedSuccesfully;
 }
 
 void Emu::enableRealtimeNotifications(bool value) {

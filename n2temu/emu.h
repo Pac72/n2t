@@ -52,7 +52,7 @@ public:
     inline bool breakpointAt(const int addr) const { return breakpoints[addr]; }
     bool toggleBreakpoint(const int addr) { return breakpoints[addr] = !breakpoints[addr]; }
     void clearAllBreakpoints();
-    void load(const QString &romPath);
+    bool load(const QString &romPath);
     void emitRegistersChanged() const ;
     void setClearRAMOnReset(bool clearRAMOnReset);
 

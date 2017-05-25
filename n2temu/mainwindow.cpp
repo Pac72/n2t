@@ -11,6 +11,7 @@
 #include <QElapsedTimer>
 #include <QFile>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QFont>
 #include <QFontDatabase>
 #include <QHeaderView>
@@ -51,7 +52,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
     initializeUi();
 
-    initFromSettings();
+    QStringList args = qApp->arguments();
+
+    if (args.size() > 1) {
+        QString filename = args[1];
+        updateSettingsAndLoadROM(filename);
+    } else {
+        initFromSettings();
+    }
 
     emu->reset();
 }
@@ -61,19 +69,40 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::loadROM(const QString &romPath) {
-    emu->load(romPath);
-
-    if (codeModel->isDebugInfoAvailable()) {
-        emit ui->checkBox_show_source_code->setChecked(true);
-        codeModel->setShowSource(true);
+void MainWindow::updateSettingsAndLoadROM(const QString &filename) {
+    QFile file(filename);
+    if (file.exists()) {
+        QFileInfo fileInfo(file);
+        QSettings settings;
+        settings.setValue("emu/rom", filename);
+        lastROMDir = fileInfo.absolutePath();
+        settings.setValue("emu/lastROMDir", lastROMDir);
+        settings.sync();
+        loadROM(filename);
     } else {
-        codeModel->setShowSource(false);
+        QByteArray filenameba = filename.toLocal8Bit();
+        const char *c_filename = filenameba.data();
+        qWarning("Cannot find file %s", c_filename);
     }
-    emit ui->checkBox_show_source_code->setEnabled(codeModel->isDebugInfoAvailable());
+}
 
-    emu->clearAllBreakpoints();
-    emu->reset();
+void MainWindow::loadROM(const QString &romPath) {
+    if (emu->load(romPath)) {
+        if (codeModel->isDebugInfoAvailable()) {
+            emit ui->checkBox_show_source_code->setChecked(true);
+            codeModel->setShowSource(true);
+        } else {
+            codeModel->setShowSource(false);
+        }
+        QString title("n2temu - ");
+        title.append(romPath);
+        setWindowTitle(title);
+
+        emit ui->checkBox_show_source_code->setEnabled(codeModel->isDebugInfoAvailable());
+
+        emu->clearAllBreakpoints();
+        emu->reset();
+    }
 }
 
 void MainWindow::initFromSettings() {
@@ -286,7 +315,6 @@ void MainWindow::on_horizontalSliderSpeed_valueChanged(int value)
     //qWarning("MainWindow::on_horizontalSliderSpeed_valueChanged(): freeRunningCycles=%d", freeRunningCycles);
 }
 
-
 void MainWindow::on_actionOpen_triggered()
 {
     QString startingPath = lastROMDir;
@@ -297,19 +325,7 @@ void MainWindow::on_actionOpen_triggered()
     fileDlg.setFileMode(QFileDialog::ExistingFile);
     if (fileDlg.exec() == QDialog::Accepted) {
         QString filename = fileDlg.selectedFiles().value(0);
-        QFile file(filename);
-        if (file.exists()) {
-            QSettings settings;
-            settings.setValue("emu/rom", filename);
-            lastROMDir = fileDlg.directory().absolutePath();
-            settings.setValue("emu/lastROMDir", lastROMDir);
-            settings.sync();
-            loadROM(filename);
-        } else {
-            QByteArray filenameba = filename.toLocal8Bit();
-            const char *c_filename = filenameba.data();
-            qWarning("Cannot find file %s", c_filename);
-        }
+        updateSettingsAndLoadROM(filename);
     }
 }
 

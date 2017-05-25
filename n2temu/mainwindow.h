@@ -57,6 +57,7 @@ private:
     void updateTableViewCode(int newValue);
     void enableUiElements(bool enable);
     void loadROM(const QString &romPath);
+    void updateSettingsAndLoadROM(const QString &romPath);
     void doStop();
 
     bool realtimeNotifications;
